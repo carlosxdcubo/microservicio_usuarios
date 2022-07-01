@@ -2,6 +2,31 @@ from turtle import st
 from flask import Flask, request
 import json
 
+def user_field_validation(new_user):
+    try:
+        name=new_user['name']
+    except:
+        return{
+            "message":"name field is empty"
+            }  
+    try:
+        lastname=new_user['lastname']
+    except:
+        return{
+            "message":"lastname field is empty"
+            }
+    try:
+        document=new_user['document']
+    except:
+        return{
+            "message":"document field is empty"
+            }                    
+    return{
+        "message": "ok"
+    }  
+    
+
+
 users ={
     "users": []
 }
@@ -21,19 +46,20 @@ def health():
 @app.route("/users", methods=["POST"])
 def create_users():
     new_user = request.get_json()
-    name=new_user['name']
-    lastname=new_user['lastname']
-    document=new_user['document']
-    
-    new_user={
-        "name":str(name),
-        "lastname":str(lastname),
-        "document":int(document)
-    }
-    users["users"].append(new_user)
-    return {
+    message=user_field_validation(new_user)
+    if message["message"] == "ok":
+        new_user={
+            "name":str(new_user['name']),
+            "lastname":str(new_user['lastname']),
+            "document":int(new_user['document'])
+        }
+        users["users"].append(new_user)
+        return {
         "message": "user created!"
-    }
+      }
+    else:
+         return message
+
 
 @app.route("/users", methods=["GET"])
 def get_users():
